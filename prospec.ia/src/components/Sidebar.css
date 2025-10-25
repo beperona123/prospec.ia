@@ -1,0 +1,12 @@
+.sidebar {
+    position:absolute;
+  top: 0;
+  left: 0;
+  height: 100%; /* ocupa a tela toda */
+  width: 12%;
+  background-color: #2459b4;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px; /* espaço para o header, se houver */
+}
