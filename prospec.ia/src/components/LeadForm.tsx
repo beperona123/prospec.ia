@@ -3,7 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { api } from "../service/api";
+import type { Cliente } from "../types/Cliente";
 
+// Criar cliente
+export async function cadastrarCliente(cliente: Cliente) {
+  const { data } = await api.post("/clientes", cliente);
+  return data;
+}
 import { Button } from "@/components/ui/button"
 import {
     Form,

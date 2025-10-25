@@ -9,82 +9,29 @@ import {
 } from "@/components/ui/table"
 import "../index.css"
 import "../Fonts.css"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { MoreHorizontalIcon } from 'lucide-react';
+import { api } from "../service/api";
+import type { Cliente } from "../types/Cliente";
 
 function truncateText(text: string, maxLength = 30) {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
 }
 
-const leads = [
-    {
-        id: 1,
-        name: "Carlos Silva",
-        email: "carlos.silva@gmail.com",
-        telefone: "(11) 91234-5678",
-        preferencias: "Interesse em imóveis residenciais",
-        divergencias: "Nenhuma",
-        sugestao: "Agendar visita"
-    },
-    {
-        id: 2,
-        name: "Fernanda Costa",
-        email: "fernanda.costa@yahoo.com",
-        telefone: "(21) 99876-5432",
-        preferencias: "Busca por apartamento próximo ao metrô",
-        divergencias: "Orçamento limitado",
-        sugestao: "Enviar opções econômicas"
-    },
-    {
-        id: 3,
-        name: "João Pereira",
-        email: "joao.pereira@hotmail.com",
-        telefone: "(31) 98765-4321",
-        preferencias: "Interesse em imóveis comerciais",
-        divergencias: "Prefere contrato flexível",
-        sugestao: "Apresentar imóveis com contrato flexível"
-    },
-    {
-        id: 4,
-        name: "Mariana Souza",
-        email: "mariana.souza@gmail.com",
-        telefone: "(41) 91234-8765",
-        preferencias: "Apartamento com área de lazer",
-        divergencias: "Não quer andar alto",
-        sugestao: "Filtrar apartamentos até 5º andar"
-    },
-    {
-        id: 5,
-        name: "Rafael Lima",
-        email: "rafael.lima@hotmail.com",
-        telefone: "(51) 97654-3210",
-        preferencias: "Interesse em imóveis de luxo",
-        divergencias: "Atraso na aprovação do financiamento",
-        sugestao: "Agendar reunião para análise de crédito"
-    },
-    {
-        id: 6,
-        name: "Patrícia Almeida",
-        email: "patricia.almeida@gmail.com",
-        telefone: "(61) 99812-3456",
-        preferencias: "Casa com quintal grande",
-        divergencias: "Prefere bairro específico",
-        sugestao: "Enviar opções de casas no bairro desejado"
-    },
-    {
-        id: 7,
-        name: "Lucas Fernandes",
-        email: "lucas.fernandes@yahoo.com",
-        telefone: "(71) 91234-9876",
-        preferencias: "Interesse em imóveis para investimento",
-        divergencias: "Quer retorno rápido",
-        sugestao: "Apresentar imóveis com potencial de valorização"
-    },
-];
+export async function listarClientes() {
+  const { data } = await api.get("/clientes");
+  return data as Cliente[];
+}
+
+
 
 export default function Leadtable() {
+
+    const [leads, setLeads] = useState<Cliente[]>([]);
+    useEffect(() => {
+        const dados = listarClientes().then((data) => setLeads(data));
+    },[leads])
     const [open, setOpen] = useState(false);
     const [selectedContent, setSelectedContent] = useState('');
     const [isHovered, setIsHovered] = useState(false);
@@ -107,9 +54,9 @@ export default function Leadtable() {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {leads.map(({ id, name, email, telefone, preferencias, divergencias, sugestao }, index) => (
-                    <TableRow className={id % 2 === 0 ? "bg-white" : "bg-gray-100"} key={id}>
-                        <TableCell className="p-[5px]">{name}</TableCell>
+                {leads.map(({ nome, email, telefone, preferencias, impedimento, sugestao }, index) => (
+                    <TableRow className={index % 2 === 0 ? "bg-white" : "bg-gray-100"} key={index}>
+                        <TableCell className="p-[5px]">{nome}</TableCell>
                         <TableCell className="p-[5px]">{email}</TableCell>
                         <TableCell className="p-[5px]">{telefone}</TableCell>
                         <TableCell>
@@ -124,17 +71,17 @@ export default function Leadtable() {
                         <TableCell>
                             <button
                                 className="p-[5px] group flex items-center space-x-2 cursor-pointer rounded-xl hover:bg-[#5daaf6] transition-colors duration-200"
-                                onClick={() => handleClick(divergencias)}
+                                onClick={() => handleClick(impedimento)}
                             >
-                                <span>{truncateText(divergencias)}</span>
+                                <span>{truncateText(impedimento)}</span>
                                 <MoreHorizontalIcon className="h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                             </button>
                         </TableCell>
                         <TableCell><button
                             className="p-[5px] group flex items-center space-x-2 cursor-pointer  rounded-xl hover:bg-[#5daaf6] transition-colors duration-200"
-                            onClick={() => handleClick(sugestao)}
+                            onClick={() => handleClick(sugestao ?? "")}
                         >
-                            <span>{truncateText(sugestao)}</span>
+                            <span>{truncateText(sugestao ?? "")}</span>
                             <MoreHorizontalIcon className="h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                         </button></TableCell>
                     </TableRow>
