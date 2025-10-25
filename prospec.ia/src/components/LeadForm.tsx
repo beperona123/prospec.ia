@@ -8,8 +8,8 @@ import type { Cliente } from "../types/Cliente";
 
 // Criar cliente
 export async function cadastrarCliente(cliente: Cliente) {
-  const { data } = await api.post("/clientes", cliente);
-  return data;
+    const { data } = await api.post("/clientes", cliente);
+    return data;
 }
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +31,7 @@ const formSchema = z.object({
         .email({ message: "E-mail inválido." }),
     telefone: z.string().min(2, { message: "Telefone deve ter pelo menos 2 caracteres." }),
     preferencias: z.string().min(2, { message: "Preferências deve ter pelo menos 2 caracteres." }),
-    divergencias: z.string().min(2, { message: "Divergências deve ter pelo menos 2 caracteres." }),
+    impedimento: z.string().min(2, { message: "Divergências deve ter pelo menos 2 caracteres." }),
 })
 
 export default function LeadForm() {
@@ -43,15 +43,31 @@ export default function LeadForm() {
             email: "",
             telefone: "",
             preferencias: "",
-            divergencias: "",
+            impedimento: "",
         },
     });
 
     // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+
+        const cliente: Cliente = {
+            nome: values.nome,
+            email: values.email,
+            telefone: values.telefone,
+            preferencias: values.preferencias,
+            impedimento: values.impedimento,
+            produto: "",       // ou valor apropriado
+            sugestao: "",      // se for parte de Cliente
+        };
+        try {
+            const response = await cadastrarCliente(cliente);
+            console.log("Cliente cadastrado com sucesso:", response);
+            alert("Cliente cadastrado com sucesso!");
+            form.reset(); // limpa o formulário após o envio
+        } catch (error) {
+            console.error("Erro ao cadastrar cliente:", error);
+            alert("Erro ao cadastrar cliente. Tente novamente.");
+        }
     }
 
     return (
@@ -123,14 +139,14 @@ export default function LeadForm() {
 
                             <FormField
                                 control={form.control}
-                                name="divergencias"
+                                name="impedimento"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Divergências</FormLabel>
+                                        <FormLabel>Impedimento</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Suas divergências" {...field} />
                                         </FormControl>
-                                        <FormDescription>Informe suas divergências.</FormDescription>
+                                        <FormDescription>Informe o impedimento na compra do cliente.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
